@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useDeviceCapability } from "./useDeviceCapability";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import CardModel from "./CardModel";
 import CardEnvironment from "./CardEnvironment";
 import Skeleton from "@/components/shared/Skeleton";
@@ -11,6 +12,7 @@ import WebGLFallback from "@/components/shared/WebGLFallback";
 
 export default function CardScene() {
   const { tier, supportsWebGL } = useDeviceCapability();
+  const isMobile = useMediaQuery("(max-width: 1024px)");
 
   if (!supportsWebGL || tier === "none") {
     return <WebGLFallback />;
@@ -33,17 +35,18 @@ export default function CardScene() {
             powerPreference: "high-performance",
             alpha: true,
           }}
-          style={{ background: "transparent" }}
+          style={{ background: "transparent", touchAction: "pan-y" }}
         >
           <CardEnvironment tier={tier} />
           <CardModel tier={tier} />
 
-          {/* Rotation auto + drag libre */}
+          {/* Rotation auto + drag libre (desactive sur mobile pour permettre le scroll) */}
           <OrbitControls
             autoRotate
             autoRotateSpeed={3}
             enableZoom={false}
             enablePan={false}
+            enableRotate={!isMobile}
             rotateSpeed={0.5}
           />
         </Canvas>
